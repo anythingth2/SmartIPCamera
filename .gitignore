@@ -1,3 +1,5 @@
 ./test/*
 weight/
 test/
+private.key
+key.py
