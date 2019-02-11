@@ -3,7 +3,6 @@ import cv2
 from threading import Timer 
 import time
 
-
 cam = cv2.VideoCapture(0)
 app = Flask(__name__)
 
@@ -11,7 +10,6 @@ def generateFrame():
     while cam.isOpened():
         _, frame = cam.read()
         _, buff = cv2.imencode('.jpg',frame)
-
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + buff.tobytes() + b'\r\n')
 
@@ -30,6 +28,7 @@ def image():
     if not ret:
         return 'fail to encode'
     return buff.tobytes()
-
 if __name__ == '__main__':
+    import socket
+    print('serve at ',socket.gethostbyname(socket.gethostname()))
     app.run(host='0.0.0.0')

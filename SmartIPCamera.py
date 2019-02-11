@@ -1,19 +1,22 @@
-from Video import VideoCamera, RPiCamera
 import StreamingClient
 import time
 import cv2
 from imageai.Detection import ObjectDetection
-MAX_FPS = 30
+import argparse
+
+ap = argparse.ArgumentParser()
+ap.add_argument('--host',required=True,help='camera server url')
+args = vars(ap.parse_args())
 
 
 
-client = StreamingClient.StreamingClient('http://localhost:5000')
+client = StreamingClient.StreamingClient(args['host'])
 client.connect()
 detector = ObjectDetection()
-detector.setModelTypeAsTinyYOLOv3()
-detector.setModelPath("./weight/yolo-tiny.h5")
+detector.setModelTypeAsYOLOv3()
+detector.setModelPath("./weight/yolo.h5")
 detector.loadModel()
-while not client.isConnected:pass
+while not client.isConnected:pass2
 while True:
     frame = client.image
     height,width = frame.shape[:2]
@@ -28,9 +31,10 @@ while True:
     
     frame[p1[0]:p2[0], p1[1]:p2[1]] = detectArea
     frame = cv2.rectangle(frame,p1[::-1], p2[::-1],color=(0,255,0),thickness=2)
+    if len(persons) > 0:
+        cv2.putText(frame, 'Alert: {} Person'.format(len(persons)),(0,64),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(255,0,0) )
     
     cv2.imshow('f',frame)
     if cv2.waitKey(1) == ord('q'):
         cv2.destroyAllWindows()
         break
-    time.sleep(1/MAX_FPS)
