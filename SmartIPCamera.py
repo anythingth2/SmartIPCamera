@@ -7,7 +7,7 @@ import tkinter
 import Calling
 
 ap = argparse.ArgumentParser()
-ap.add_argument('--host',required=True,help='camera server url')
+ap.add_argument('--host',required=True,help='camera server url',default='http://192.168.31.22:5000')
 ap.add_argument('--debug',default = False, type=bool)
 args = vars(ap.parse_args())
 
@@ -24,7 +24,7 @@ detector.loadModel()
 
 while not client.isConnected: pass
 while True:
-    frame = client.image
+    frame = client.image.copy()
     height,width = frame.shape[:2]
     # center rectangle
     # p1 =  height//4, width//4
