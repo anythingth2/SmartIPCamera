@@ -1,4 +1,5 @@
 import nexmo
+from threading import Timer
 import key
 from pprint import pprint
 
@@ -7,8 +8,13 @@ client = nexmo.Client(
     private_key=key.privateKey,
 )
 
-def call(phone,text):
-    if isinstance(phone,str) :
+isCalling = False
+CALL_INTERVAL = 10
+def sendCall(phone,text):
+    global isCalling
+    
+    print('call to {} with msg:{}'.format(phone,text))
+    if isinstance(phone,str):
         phone = [phone]
     for p in phone:
         response = client.create_call({
@@ -22,5 +28,14 @@ def call(phone,text):
                 ]
         })
         pprint(response)
+    isCalling = False
+def call(phone, text):
+    
+    global isCalling
+    if not isCalling:
+        isCalling = True
+        Timer(CALL_INTERVAL,sendCall,(phone,text)).start()
 if __name__ == '__main__':
-    call('66966494859','Help me')
+    while True:
+        call(['66966494859'],'Help me')
+    # Timer(5,call,('','')).start()
