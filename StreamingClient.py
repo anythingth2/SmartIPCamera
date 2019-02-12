@@ -36,5 +36,4 @@ class StreamingClient:
         self.thread = Thread(target=self.__connect)
         self.thread.daemon = True
         self.thread.start()
-    def isConnecting(self):
-        return self.req
+    

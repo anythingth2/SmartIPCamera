@@ -5,7 +5,7 @@ from imageai.Detection import ObjectDetection
 import argparse
 import tkinter
 import Calling
-
+TEL = ['66966494859','66836889001','66840995919']
 ap = argparse.ArgumentParser()
 ap.add_argument('--host',required=True,help='camera server url',default='http://192.168.31.22:5000')
 ap.add_argument('--debug',default = False, type=bool)
@@ -23,6 +23,7 @@ detector.loadModel()
 
 
 while not client.isConnected: pass
+i = 0
 while True:
     frame = client.image.copy()
     height,width = frame.shape[:2]
@@ -51,10 +52,13 @@ while True:
             msg = 'Alert: {} Persons'.format(len(persons))
         cv2.putText(frame, msg, (0,64), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,0,255) ,3)
         if not args['debug']:
-            Calling.call('66966494859','Alert Alert Alert Alert Alert')
+            Calling.call(TEL,'Camera 123 was detected invader')
     
     
+    frame = cv2.resize(frame,None,fx=2,fy=2)
     cv2.imshow('f',frame)
     if cv2.waitKey(1) == ord('q'):
         cv2.destroyAllWindows()
         break
+    i+=1
+    print(i)
