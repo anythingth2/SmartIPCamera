@@ -5,15 +5,16 @@ from imageai.Detection import ObjectDetection
 import argparse
 import tkinter
 import Calling
-TEL = ['66966494859','66836889001','66840995919']
+TEL = ['66966494859','']
 ap = argparse.ArgumentParser()
-ap.add_argument('--host',required=True,help='camera server url',default='http://192.168.31.22:5000')
+ap.add_argument('--host',help='camera server url',default='http://192.168.31.22:5000')
 ap.add_argument('--debug',default = False, type=bool)
 args = vars(ap.parse_args())
 
 
 
-client = StreamingClient.StreamingClient(args['host'])
+# client = StreamingClient.StreamingClient(args['host'])
+client = StreamingClient.LocalClient()
 client.connect()
 detector = ObjectDetection()
 detector.setModelTypeAsYOLOv3()
@@ -22,7 +23,10 @@ detector.loadModel()
 
 
 
-while not client.isConnected: pass
+while not client.isConnected: 
+    print('.')
+    time.sleep(1)
+print('start detection')
 i = 0
 while True:
     frame = client.image.copy()
@@ -31,9 +35,13 @@ while True:
     # p1 =  height//4, width//4
     # p2 =  height*3//4, width*3//4
     
-    p1 = 0, width//2
-    p2 = height, width
+    #right half rectangle
+    # p1 = 0, width//2
+    # p2 = height, width
 
+    #left half rectangle
+    p1 = 0,0
+    p2 = height,width//2
     detectArea = frame[p1[0]:p2[0], p1[1]:p2[1]]
     
     _, detections = detector.detectObjectsFromImage(input_image=detectArea,input_type='array',output_type='array', minimum_percentage_probability=30,)
@@ -52,8 +60,10 @@ while True:
             msg = 'Alert: {} Persons'.format(len(persons))
         cv2.putText(frame, msg, (0,64), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,0,255) ,3)
         if not args['debug']:
-            Calling.call(TEL,'Camera 123 was detected invader')
-    
+            try:
+                Calling.call(TEL,'Camera 123 was detected invader')
+            except:
+                print('cant connect nexmo')
     
     frame = cv2.resize(frame,None,fx=2,fy=2)
     cv2.imshow('f',frame)
